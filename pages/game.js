@@ -15,7 +15,7 @@ export default function Game() {
 
   useEffect(() => {
     if (!start) {
-      fetch("http://ai4y.ddns.net:5000/get_bird", {
+      fetch("http://ai4y.ddns.net:5000/get_bird/", {
         method: "GET",
       })
         .then((res) => {
