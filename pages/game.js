@@ -17,12 +17,16 @@ export default function Game() {
   const [answer, setAnswer] = useState(0);
   const [start, isStart] = useState(false);
   const [score, setScore] = useState(0);
-  const [round, setRound] = useState(1);
+  const [round, setRound] = useState(0);
+
   useEffect(() => {
     load();
   });
 
   const load = useCallback(() => {
+    if (round == 3) {
+      Router.push({ pathname: "/end", query: { score } });
+    }
     if (!start) {
       fetch("https://bird-game-backend.herokuapp.com/get_bird", {
         method: "GET",
@@ -38,23 +42,19 @@ export default function Game() {
             setImage2loc(data.image2);
             setSoundloc(data.soundPath);
             setAnswer(data.answer);
-            console.log(data);
           } else {
             console.log("unable to fetch backend");
           }
         });
       isStart(true);
     }
-  }, [start]);
+  }, [start, round, score]);
 
   const chooseBird = (selection) => {
     if (selection == answer) {
       setScore(score + 1);
     }
     setRound(round + 1);
-    if (round == 3) {
-      Router.push({ pathname: "/end", query: { score } });
-    }
     isStart(false);
     load();
   };
