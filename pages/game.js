@@ -1,10 +1,11 @@
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import Router, { useRouter } from "next/router";
 import Link from "next/link";
+import Modal from "../components/modal";
 
 export default function Game() {
   const router = useRouter();
@@ -14,17 +15,30 @@ export default function Game() {
   const [image1loc, setImage1loc] = useState("");
   const [image2loc, setImage2loc] = useState("");
   const [soundloc, setSoundloc] = useState("");
+  const [ai, setAi] = useState("");
+  const [conf, setConf] = useState(0);
   const [answer, setAnswer] = useState(0);
   const [start, isStart] = useState(false);
   const [score, setScore] = useState(0);
   const [round, setRound] = useState(0);
+  const [correct, isCorrect] = useState(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [a, setA] = useState(null);
+  const openModal = (_) => {
+    setModalVisible(true);
+  };
+  const closeModal = (_) => {
+    setModalVisible(false);
+    isStart(false);
+  };
 
   useEffect(() => {
     load();
   });
 
   const load = useCallback(() => {
-    if (round == 3) {
+    if (round == 3 && modalVisible == false) {
       Router.push({ pathname: "/end", query: { score } });
     }
     if (!start) {
@@ -42,21 +56,23 @@ export default function Game() {
             setImage2loc(data.image2);
             setSoundloc(data.soundPath);
             setAnswer(data.answer);
+            setAi(data.ai);
+            setConf(data.conf);
           } else {
             console.log("unable to fetch backend");
           }
         });
       isStart(true);
     }
-  }, [start, round, score]);
+  }, [round, modalVisible, start, score]);
 
   const chooseBird = (selection) => {
     if (selection == answer) {
       setScore(score + 1);
+      isCorrect(true);
     }
     setRound(round + 1);
-    isStart(false);
-    load();
+    openModal();
   };
 
   return (
@@ -71,6 +87,17 @@ export default function Game() {
       </Head>
 
       <main className={styles.main}>
+        <Modal
+          isToggled={modalVisible}
+          setToggled={openModal}
+          closeModal={closeModal}
+          correct={correct}
+          data={{
+            ans: answer == 1 ? bird1name : bird2name,
+            ai: ai,
+            conf: Math.round(conf * 10000) / 100,
+          }}
+        />
         <motion.div
           initial="hidden"
           animate="visible"
