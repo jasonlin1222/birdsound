@@ -4,10 +4,18 @@ import styles from "../styles/Home.module.css";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { VscDebugRestart } from "react-icons/vsc";
+import Router, { useRouter } from "next/router";
 
-export default function Main() {
-  const [score, setScore] = useState(0);
-  const [round, setRound] = useState(1);
+export default function End() {
+  const router = useRouter();
+  const data = router.query;
+  const [score, setScore] = useState(data.score);
+
+  useEffect(() => {
+    setScore(data.score);
+  }, [data.score]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -36,26 +44,7 @@ export default function Main() {
             },
           }}
         >
-          <h1>來挑戰 AI 吧!</h1>
-        </motion.div>
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: {
-              scale: 0.8,
-              opacity: 0,
-            },
-            visible: {
-              scale: 1,
-              opacity: 1,
-              transition: {
-                delay: 0.6,
-              },
-            },
-          }}
-        >
-          <h2>看你能不能辨識不同的鳥類時期</h2>
+          <h1>你的分數是:</h1>
         </motion.div>
         <motion.div
           initial="hidden"
@@ -74,12 +63,30 @@ export default function Main() {
             },
           }}
         >
-          <Link
-            href={{
-              pathname: "/game",
-            }}
-          >
-            <button>開始遊戲</button>
+          <h2>{score} / 3</h2>
+        </motion.div>
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: {
+              scale: 0.8,
+              opacity: 0,
+            },
+            visible: {
+              scale: 1,
+              opacity: 1,
+              transition: {
+                delay: 1.5,
+              },
+            },
+          }}
+        >
+          <Link href="/">
+            <button>
+              再玩一次
+              <VscDebugRestart />
+            </button>
           </Link>
         </motion.div>
       </main>

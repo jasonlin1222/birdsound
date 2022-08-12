@@ -2,20 +2,29 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Router, { useRouter } from "next/router";
+import Link from "next/link";
 
 export default function Game() {
+  const router = useRouter();
+  const data = router.query;
   const [bird1name, setBird1name] = useState("");
   const [bird2name, setBird2name] = useState("");
   const [image1loc, setImage1loc] = useState("");
   const [image2loc, setImage2loc] = useState("");
+  const [soundloc, setSoundloc] = useState("");
   const [answer, setAnswer] = useState(0);
-  const [selection, setSelection] = useState(0);
   const [start, isStart] = useState(false);
-
+  const [score, setScore] = useState(0);
+  const [round, setRound] = useState(1);
   useEffect(() => {
+    load();
+  });
+
+  const load = useCallback(() => {
     if (!start) {
-      fetch("http://ai4y.ddns.net:5000/get_bird/", {
+      fetch("https://ai4y.ddns.net:5000/get_bird", {
         method: "GET",
       })
         .then((res) => {
@@ -27,6 +36,7 @@ export default function Game() {
             setBird2name(data.bird2);
             setImage1loc(data.image1);
             setImage2loc(data.image2);
+            setSoundloc(data.soundPath);
             setAnswer(data.answer);
             console.log(data);
           } else {
@@ -37,10 +47,16 @@ export default function Game() {
     }
   }, [start]);
 
-  const chooseBird = () => {
+  const chooseBird = (selection) => {
     if (selection == answer) {
-      console.log("correct");
+      setScore(score + 1);
     }
+    setRound(round + 1);
+    if (round == 3) {
+      Router.push({ pathname: "/end", query: { score } });
+    }
+    isStart(false);
+    load();
   };
 
   return (
@@ -98,15 +114,14 @@ export default function Game() {
             },
           }}
         >
-          <audio controls autoPlay src="">
+          <audio controls src={soundloc}>
             Your browser does not support the audio element.
           </audio>
         </motion.div>
         <ul className={styles.grid}>
           <motion.li
             onClick={() => {
-              setSelection(1);
-              chooseBird();
+              chooseBird(1);
             }}
             initial="hidden"
             animate="visible"
@@ -141,8 +156,7 @@ export default function Game() {
           </motion.li>
           <motion.li
             onClick={() => {
-              setSelection(2);
-              chooseBird();
+              chooseBird(2);
             }}
             initial="hidden"
             animate="visible"
