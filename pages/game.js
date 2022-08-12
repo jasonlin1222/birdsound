@@ -24,7 +24,7 @@ export default function Game() {
 
   const load = useCallback(() => {
     if (!start) {
-      fetch("https://ai4y.ddns.net:5000/get_bird", {
+      fetch("https://bird-game-backend.herokuapp.com/get_bird", {
         method: "GET",
       })
         .then((res) => {
