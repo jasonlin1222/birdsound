@@ -30,6 +30,7 @@ export default function Game() {
   };
   const closeModal = (_) => {
     setModalVisible(false);
+    isCorrect(false);
     isStart(false);
   };
 
